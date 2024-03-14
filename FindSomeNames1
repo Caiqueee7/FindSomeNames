@@ -1,0 +1,38 @@
+import requests
+from bs4 import BeautifulSoup
+from collections import Counter
+
+def get_names_from_website(url):
+    # Fetch the webpage content
+    response = requests.get(url)
+    if response.status_code != 200:
+        print("Failed to fetch the webpage.")
+        return
+
+    # Parse the HTML content
+    soup = BeautifulSoup(response.content, 'html.parser')
+
+    # Find all elements containing names
+    names = [tag.get_text() for tag in soup.find_all('span', class_='name')]  # Modify the selector according to your site's structure
+
+    return names
+
+def find_most_common_name(names):
+    # Count occurrences of each name
+    name_counts = Counter(names)
+
+    # Find the name(s) with more than two occurrences
+    repeated_names = [name for name, count in name_counts.items() if count > 2]
+
+    return repeated_names
+
+if __name__ == "__main__":
+    # Example usage
+    url = input("Enter the URL of the website: ")
+    names = get_names_from_website(url)
+    if names:
+        repeated_names = find_most_common_name(names)
+        if repeated_names:
+            print("The name(s) repeated more than two times:", repeated_names)
+        else:
+            print("No name is repeated more than two times.")
